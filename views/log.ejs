@@ -1,0 +1,73 @@
+<div class="col" style="padding-left: 0;">
+    <div class="main__wrapper">
+        <div class="header__main">
+            <h2>Logs</h2>
+            <p>This is log page</p>
+        </div>
+        <div class="log__wrapper">
+            <div class="log__container">
+                <div class="log__table-header">
+                    <h4 class="log__table-heading">Logs</h4>
+                </div>
+                <div class="log__table-container">
+                    <table class="table log__table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID thiết bị</th>
+                                <th scope="col">Địa chỉ IP</th>
+                                <th scope="col">Tên thiết bị</th>
+                                <th scope="col">Cảm biến</th>
+                                <th scope="col">Giá trị</th>
+                                <th scope="col">Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody class="log__table-body">
+                            <!-- <tr>
+                                <td>13832938</td>
+                                <td>192.168.1.1</td>
+                                <td>Wemos D1</td>
+                                <td>Nhiệt độ</td>
+                                <td>32</td>
+                                <td>30/04/2022</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="log-pagination__container">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item"><a class="page-link" href="/log?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>">Previous</a></li>
+                        <% for (var i =1; i <=paginationNumber;  i++ ) { %>
+                        <br/>  <li class="page-item"><a class="page-link" href="/log?page=<%= i %>"><%= i %></a></li>
+                        <% } %>
+                        <li class="page-item"><a class="page-link" href="/log?page=<%= currentPage >= (paginationNumber + 1) ? paginationNumber + 1 : currentPage + 1 %>">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const logs = JSON.parse('<%- JSON.stringify(logs) %>');
+    const logTableBody = document.querySelector('.log__table-body');
+
+    const logsHTML = logs.map(deviceLog => {
+        let date = new Date(deviceLog.date);
+        date = date.toLocaleDateString();
+        return `
+            <tr>
+                <td>${deviceLog.deviceId}</td>
+                <td>${deviceLog.ipAddress}</td>
+                <td>${deviceLog.deviceName}</td>
+                <td>${deviceLog.sensor}</td>
+                <td>${deviceLog.value}</td>
+                <td>${date}</td>
+            </tr>
+        `;
+    }).join('');
+
+    logTableBody.innerHTML = logsHTML;
+</script>

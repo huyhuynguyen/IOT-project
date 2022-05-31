@@ -1,0 +1,116 @@
+body {
+  background-color: #eee;
+  font-size: 26px;
+}
+
+.header__main {
+  background-color: #2b7ffa;
+  padding: 20px 15px;
+  color: #fff;
+}
+
+.dashboard__content {
+  padding: 20px 15px;
+  display: flex;
+}
+
+.dashboard__content .card:first-child {
+  margin-left: 0;
+}
+
+.main-page__container {
+  width: 550px;
+  margin-top: 40px;
+  margin-left: 40px;
+  border: 1px solid #9a9a9a;
+  border-radius: 5px;
+}
+
+.sensor-table__header {
+  background-color: #404fea;
+  color: #fff;
+}
+
+.sensor-table__heading {
+  padding: 10px 15px;
+  font-size: 1.3rem;
+}
+
+.sensor-table__value {
+  margin: 0 10px;
+}
+
+.value-sensor {
+  display: flex;
+  padding: 5px 15px;
+  align-items: center;
+}
+
+.value-sensor .name {
+  color: #777;
+}
+
+.value-sensor .value {
+  font-size: 1.5rem;
+}
+
+.value-sensor img {
+  width: 70%;
+  margin-left: 10px;
+}
+
+.sensor-table__led {
+	padding: 5px 15px;
+}
+
+
+.led__container {
+	margin: 10px 0px;
+}
+
+.led__container .led__device {
+	margin: 0 40px;
+}
+
+.btn-led {
+	font-weight: bold;
+	color: #fff;
+	background-color: #2196f3;
+	border: 1px solid #fff;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.led-on {
+	background-color: #40f052;
+}
+
+.led-off {
+	background-color: #f04040;
+}
+
+.log__container {
+  margin: 10px 20px;
+  padding: 10px 20px;
+  background-color: #fff;
+  border: 1px solid #cecece;
+  border-radius: 5px;
+  width: 70%;
+}
+
+.log__table-header {
+  color: #2b7ffa;
+  text-transform: uppercase;
+}
+
+.log__table-container {
+  margin-top: 20px;
+}
+
+.log__table thead {
+  background-color: #d6d6d6;
+}
+
+.log-pagination__container {
+  margin-left: 50px;
+}

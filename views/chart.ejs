@@ -1,0 +1,86 @@
+<div class="col" style="padding-left: 0;">
+    <div class="main__wrapper">
+        <div class="header__main">
+            <h2>Charts</h2>
+            <p>This is chart page</p>
+        </div>
+        <div class="chart__wrapper">
+            <div class="row mx-5 my-5">
+                <div class="chart__component col-6" style="width: 500px; height: 500px;">
+                    <div>
+                        <h4>Cảm biến nhiệt độ</h4>
+                    </div>
+                    <canvas id="myChart3" width="400" height="400"></canvas>
+                </div>
+                <div class="chart__component col-6" style="width: 500px; height: 500px;">
+                    <div>
+                        <h4>Cảm biến độ ẩm</h4>
+                    </div>
+                    <canvas id="myChart2" width="400" height="400"></canvas>
+                </div>
+                <div class="w-100"></div>
+                <div class="chart__component col-6 mt-5" style="width: 500px; height: 500px;">
+                    <div>
+                        <h4>Cảm biến ánh sáng</h4>
+                    </div>
+                    <canvas id="myChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const light = JSON.parse('<%- JSON.stringify(light) %>');
+    const humi = JSON.parse('<%- JSON.stringify(humi) %>');
+    const temp = JSON.parse('<%- JSON.stringify(temp) %>');
+    
+    function drawChart(id, type, data = []) {
+        const ctx = document.getElementById(id).getContext('2d');
+        const myChart = new Chart(ctx, {
+            type,
+            data: {
+                labels: [
+                    'Red', 
+                    'Blue', 
+                    'Yellow', 
+                    'Green', 
+                    'Purple', 
+                    // 'Orange',
+                ],
+                datasets: [{
+                    label: 'value',
+                    data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        // 'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        // 'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    drawChart('myChart', 'pie', light.map(item => item.value).reverse());
+    drawChart('myChart2', 'bar', humi.map(item => item.value).reverse());
+    drawChart('myChart3', 'line', temp.map(item => item.value).reverse());
+</script>

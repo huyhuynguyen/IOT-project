@@ -1,0 +1,100 @@
+<div class="col" style="padding-left: 0;">
+    <div class="main__wrapper">
+        <div class="header__main">
+            <h2>Main</h2>
+            <p>This is main page</p>
+        </div>
+        <div class="main-page__wrapper">
+            <div class="main-page__container">
+                <div class="sensor-table__header">
+                    <h4 class="sensor-table__heading">Điều khiển thiết bị</h4>
+                </div>
+                <div class="sensor-table__body">
+                    <div class="sensor-table__value d-flex">
+                        
+                    </div>
+                    <div class="sensor-table__led">
+                        <h4>Các thiết bị</h4>
+                        <div class="led__container d-flex">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sensors = JSON.parse('<%- JSON.stringify(sensors) %>');
+	const leds = JSON.parse('<%- JSON.stringify(leds) %>');
+    const sensorsTable = document.querySelector('.sensor-table__value');
+	const ledContainer = document.querySelector('.led__container');
+
+    const sensorsHTML = sensors.map(sensor => {
+        return `
+            <div class="value-sensor">
+                <div>
+                    <p class="name">${sensor.name}</p>
+                    <p class="value">${sensor.value} ${sensor.unit}</p>
+                </div>
+                <div>
+                    <img src="${sensor.icon}" alt="">
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const ledsHTML = leds.map(led => {
+        const ledObj = {
+            label: led.status ? 'On' : 'Off',
+            className: led.status ? 'led-on' : 'led-off'
+        }
+        return `
+            <div class="led__device">
+                <p id=${+led.id} class="led-name">${led.name}</p>
+                <div class="led-label__container">
+                    <button class="btn-led ${ledObj.className}">${ledObj.label}</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    sensorsTable.innerHTML = sensorsHTML;
+    ledContainer.innerHTML = ledsHTML;
+
+    var sendajax = function(ledId) {
+        var xhttp = new XMLHttpRequest()
+
+        xhttp.onreadystatechange = function() {
+            if (this.status == 200) {
+                console.log(this.responseText);
+            }
+        }
+
+        xhttp.open('POST', 'http://localhost:5000/main/sensor/change-led-status', true)
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhttp.send(`ledId=${ledId}`);
+    }
+
+    const btnLeds = document.querySelectorAll('.btn-led')
+    btnLeds.forEach(btnLed => {
+        btnLed.addEventListener('click', (e) => {
+            const ledButton = e.target
+            ledId = ledButton.closest('.led__device').querySelector('.led-name').id
+            changeLedStatus(ledButton)
+            sendajax(ledId)
+
+        })
+    })
+
+    function changeLedStatus(ledButton) {
+        const ledButtonClassName = ledButton.className.split(' ')[1]
+        const ledButtonLabel = ledButton.innerText
+        const ledObj = {
+            label: ledButtonLabel == 'Off' ? 'On' : 'Off',
+            className: ledButtonClassName == 'led-off' ? 'led-on' : 'led-off'
+        }
+
+        ledButton.innerText = ledObj.label
+        ledButton.className = ['btn-led', ledObj.className].join(' ')
+    }
+</script>

@@ -1,0 +1,44 @@
+<div class="col" style="padding-left: 0;">
+    <div class="main__wrapper">
+        <div class="header__main">
+            <h2>Dashboard</h2>
+            <div>
+                <p>Chào mừng bạn đến với bài thực hành của nhóm 06 chúng tôi !!!!</p>
+    
+                <div>
+                    <p>Tên nhóm: Nhóm 06</p>
+                    <p>Thành viên 1: 18520846 - Nguyễn Quang Huy</p>
+                    <p>Thành viên 2: 1852 - Đoàn Văn Đắc</p>
+                    <p>Thành viên 3: 1852 - Lê Tuấn Anh</p>
+                    <p>Bài thực hành số 4</p>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard__content">
+        </div>
+    </div>
+</div>
+
+<script>
+    const devices = JSON.parse('<%- JSON.stringify(devices) %>');
+    const dashboardContent = document.querySelector('.dashboard__content');
+
+    const devicesHTML = devices.map(device => {
+        let date = new Date(device.lastAccess);
+        date = date.toLocaleDateString();
+        return `
+            <div class="card mx-5" style="width: 19rem;" id="${device.id}">
+                <img class="card-img-top" src="images/${device.imageName}" alt="Card image cap">
+                <div class="card-body">
+                    <h4>${device.name}</h4>
+                    <p>Active: <span class="status-color-active">${device.active}</span></p>
+                    <p class="card-text">
+                        <span>Last access date: </span> 
+                        <span>${date}</span>
+                    </p>
+                </div>
+            </div>
+        `;
+    }).join('');
+    dashboardContent.innerHTML = devicesHTML;
+</script>
