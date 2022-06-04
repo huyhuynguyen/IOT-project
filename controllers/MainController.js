@@ -79,29 +79,30 @@ class MainController {
     }
 
     async updateSensors(req, res, next) {
-        const sensorRef = collection(db.database, 'sensors')
-        const q = query(sensorRef, where("id", '==', +req.params.id))
-        const documentSnapshots = await getDocs(q)
-        var sensorName = ''
-        let docRef = ''
-        documentSnapshots.forEach((docItem) => {
-            docRef = doc(db.database, "sensors", docItem.id)
-            sensorName = docItem.data().name
-        });
-        await updateDoc(docRef, {
-            value: req.body.value
-        })
+        const dataBody = req.body
+        const listKeys = Object.keys(dataBody)
 
-        // create log
-        const now = dayjs().add(7, 'h')
-        const logRef = await addDoc(collection(db.database, "logs"), {
-            date: now.toISOString(),
-            deviceId: req.body.deviceId,
-            deviceName: req.body.deviceName,
-            ipAddress: req.body.ipAddress,
-            sensor: sensorName,
-            value: req.body.value
-        })
+        const sensorRef = collection(db.database, 'sensors')
+        const documentSnapshots = await getDocs(sensorRef)
+        documentSnapshots.forEach(async (docItem) => {
+            docRef = doc(db.database, "sensors", docItem.id)
+            const now = dayjs().add(7, 'h')
+            if (listKeys.includes(docItem.id)) {
+                await updateDoc(docRef, {
+                    value: dataBody[docItem.id].value
+                })
+
+                // create log
+                await addDoc(collection(db.database, "logs"), {
+                    date: now.toISOString(),
+                    deviceId: 1,
+                    deviceName: dataBody[docItem.id].deviceName,
+                    ipAddress: dataBody[docItem.id].ipAddress,
+                    sensor: dataBody[docItem.id].sensor,
+                    value: dataBody[docItem.id].value
+                })
+            }
+        });
         
         return res.json('Success')
     }
