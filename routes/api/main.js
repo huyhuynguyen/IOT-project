@@ -9,5 +9,6 @@ router.get('/controls/pump', mainController.getPump);
 router.get('/controls/servo', mainController.getServo);
 router.get('/sensors', mainController.getSensors);
 router.post('/sensor/change-control-device-status', mainController.changeControlDeviceStatus);
+router.post('/sensor/change-control-device-manual-status', mainController.changeControlDeviceManualStatus);
 
 module.exports = router;

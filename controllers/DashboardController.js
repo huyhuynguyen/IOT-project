@@ -1,10 +1,10 @@
 const db = require('../config/db/firebase');
 const { getDocs, collection, updateDoc, doc } = require('firebase/firestore');
+const dayjs = require('dayjs');
 class DashboardController {
     async index(req, res, next) {
         return res.render('index', {
-            title: 'Dashboard',
-            devices: []
+            title: 'Dashboard'
         })
     }
 
@@ -14,7 +14,8 @@ class DashboardController {
         querySnapshot.forEach((doc) => {
             result.push({
                 docid: doc.id,
-                data: doc.data()
+                data: doc.data(),
+                date: dayjs(doc.data().lastAccess).subtract(7, 'h')
             })
         });
 

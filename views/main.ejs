@@ -15,6 +15,12 @@
                     </div>
                     <div class="sensor-table__led">
                         <h4>Devices</h4>
+                        <div class="device__manual-wrapper">
+                            <!-- <div class="device__manual-container d-flex">
+                                <p>Manual Control</p>
+                                <button class="device__manual-btn manual-off">Off</button>
+                            </div> -->
+                        </div>
                         <div class="d-flex">
                             <div class="led__container d-flex">
                             </div>
@@ -83,6 +89,19 @@
         xhttp.send(`deviceDoc=${docId}`);
     }
 
+    var sendajaxManual = function() {
+        var xhttp = new XMLHttpRequest()
+
+        xhttp.onreadystatechange = function() {
+            if (this.status == 200) {
+                console.log(this.responseText);
+            }
+        }
+
+        xhttp.open('POST', 'http://localhost:5000/api/main/sensor/change-control-device-manual-status', true)
+        xhttp.send();
+    }
+
     function changeControlDeviceStatus(controlDeviceButton, controlDeviceClassName) {
         const controlDeviceButtonClassName = controlDeviceButton.className.split(' ')[1]
         const controlDeviceButtonLabel = controlDeviceButton.innerText
@@ -91,36 +110,92 @@
             className: controlDeviceButtonClassName == `${controlDeviceClassName}-off` ? `${controlDeviceClassName}-on` : `${controlDeviceClassName}-off`
         }
 
+        // console.log(controlDeviceObj);
+
         controlDeviceButton.innerText = controlDeviceObj.label
-        controlDeviceButton.className = [`btn-${controlDeviceClassName}`, controlDeviceObj.className].join(' ')
+        controlDeviceButton.className = [`btn-${controlDeviceClassName}`, controlDeviceObj.className, 'button-control'].join(' ')
+    }
+
+    function changeManualStatus(manualButton) {
+        const manualButtonClassName = manualButton.className.split(' ')[1]
+        const manualButtonLabel = manualButton.innerText
+        const manualObj = {
+            label: manualButtonLabel == 'Off' ? 'On' : 'Off',
+            className: manualButtonClassName == `manual-off` ? 'manual-on' : `manual-off`
+        }
+
+        manualButton.innerText = manualObj.label
+        manualButton.className = [`device__manual-btn`, manualObj.className].join(' ')
     }
 
     function getStateControlDevice(controlDevice, controlDeviceClassName) {
         const controlDeviceData = controlDevice.data
         const controlDeviceContainer = document.querySelector(`.${controlDeviceClassName}__container`);
+        const controlDeviceManualContainer = document.querySelector('.device__manual-wrapper')
         const controlDeviceObj = {
             label: controlDeviceData.status ? 'On' : 'Off',
-            className: controlDeviceData.status ? `${controlDeviceClassName}-on` : `${controlDeviceClassName}-off`
+            className: controlDeviceData.status ? `${controlDeviceClassName}-on` : `${controlDeviceClassName}-off`,
+            manualLable: controlDeviceData.manual ? 'On' : 'Off',
+            manualClassName: controlDeviceData.manual ? 'manual-on' : 'manual-off'
         }
+
+        const manunalControlDeviceHTML = `
+            <div class="device__manual-container d-flex">
+                <p>Manual Control</p>
+                <button class="device__manual-btn ${controlDeviceObj.manualClassName}">${controlDeviceObj.manualLable}</button>
+            </div>
+        `;
+        controlDeviceManualContainer.innerHTML = manunalControlDeviceHTML
 
         const controlDeviceHTML = `
             <div class="${controlDeviceClassName}__device">
                 <p id=${controlDevice.docId} class="${controlDeviceClassName}-name">${controlDeviceData.name}</p>
                 <div class="${controlDeviceClassName}-label__container">
-                    <button class="btn-${controlDeviceClassName} ${controlDeviceObj.className}">${controlDeviceObj.label}</button>
+                    <button class="btn-${controlDeviceClassName} ${controlDeviceObj.className} button-control">${controlDeviceObj.label}</button>
                 </div>
             </div>
         `;
         controlDeviceContainer.innerHTML = controlDeviceHTML;
 
-        const btnControlDevices = document.querySelectorAll(`.btn-${controlDeviceClassName}`)
-        btnControlDevices.forEach(controlDevice => {
-            controlDevice.addEventListener('click', (e) => {
-                const controlDeviceButton = e.target
-                docId = controlDeviceButton.closest(`.${controlDeviceClassName}__device`).querySelector(`.${controlDeviceClassName}-name`).id
-                changeControlDeviceStatus(controlDeviceButton, controlDeviceClassName)
-                sendajax(docId)
+
+        const btnControls = document.querySelectorAll(`.button-control`)
+        const btnManual = document.querySelector('.device__manual-btn');
+
+        if (btnManual.classList[1] == "manual-off") {
+            btnControls.forEach(btn => {
+                btn.disabled = true; // disable button
+                btn.removeEventListener("click", () => {});
             })
+        } else {
+            changeControlDevice(controlDeviceClassName)
+        }
+
+        btnManual.addEventListener('click', (e) => {
+            const manualButton = e.target;
+            changeManualStatus(manualButton);
+            // remove event click listener
+            if (btnManual.classList[1] == "manual-off") {
+                btnControls.forEach(btn => {
+                    btn.disabled = true;
+                })
+            } else {
+                btnControls.forEach(btn => {
+                    btn.disabled = false;
+                })
+            }
+
+            sendajaxManual()
+        })
+    }
+
+    function changeControlDevice(controlDeviceClassName) {
+        const btnControlDevice = document.querySelector(`.btn-${controlDeviceClassName}`)
+        
+        btnControlDevice.addEventListener('click', (e) => {
+            const controlDeviceButton = e.target
+            docId = controlDeviceButton.closest(`.${controlDeviceClassName}__device`).querySelector(`.${controlDeviceClassName}-name`).id
+            changeControlDeviceStatus(controlDeviceButton, controlDeviceClassName)
+            sendajax(docId)
         })
     }
 </script>

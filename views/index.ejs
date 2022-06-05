@@ -32,7 +32,7 @@
         const dashboardContent = document.querySelector('.dashboard__content');
 
         const devicesHTML = devices.map(device => {
-            let date = new Date(device.data.lastAccess);
+            let date = new Date(device.date);
             date = date.toLocaleDateString();
             return `
                 <div class="card mx-5" style="width: 19rem;" id="${device.data.id}">

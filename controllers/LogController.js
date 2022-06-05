@@ -7,9 +7,9 @@ const {
     where,
     orderBy,
     limit,
-    startAfter,
     doc,
     getDoc,
+    updateDoc,
 } = require('firebase/firestore');
 const db = require('../config/db/firebase');
 
@@ -22,14 +22,6 @@ class LogController {
             page = 1
         const logRef = collection(db.database, "logs")
         let q = query(logRef, orderBy("date", "desc"), limit(limitItem));
-        // if (req.query.last) {
-        //     const docRef = doc(db.database, "logs", req.query.last)
-        //     const docRefSnapshot = await getDoc(docRef)
-        //     q = query(logRef, orderBy("date", "desc"), startAfter(docRefSnapshot), limit(limitItem));
-        // } else {
-        //     q = query(logRef, orderBy("date", "desc"), limit(limitItem));
-        // }
-
 
         const documentSnapshots = await getDocs(q);
         const result = []
@@ -39,7 +31,27 @@ class LogController {
                 data: doc.data()
             })
         });
-        const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+        const lastLogData = result[result.length - 1].data;
+        const lastLogDate = lastLogData.date
+        let date = new Date(lastLogDate);
+        const now = dayjs().add(7, 'h')
+        const docRef = doc(db.database, "devices", "esp")
+
+        if (now.hour() - dayjs(date).hour() > 5) {
+            // update esp8266 status
+            await updateDoc(docRef, {
+                active: false,
+                lastAccess: now.toISOString()
+            })
+        } else {
+            if (!(await getDoc(docRef)).data().active) {
+                await updateDoc(docRef, {
+                    active: true,
+                    lastAccess: now.toISOString()
+                })
+            }
+        }
 
         res.render('log', {
             title: 'Logs',
