@@ -34,36 +34,26 @@
                     </table>
                 </div>
             </div>
-
-            <div class="log-pagination__container">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link" href="/log?page=<%= currentPage > 1 ? currentPage - 1 : 1 %>">Previous</a></li>
-                        <% for (var i =1; i <=paginationNumber;  i++ ) { %>
-                        <br/>  <li class="page-item"><a class="page-link" href="/log?page=<%= i %>"><%= i %></a></li>
-                        <% } %>
-                        <li class="page-item"><a class="page-link" href="/log?page=<%= currentPage >= (paginationNumber + 1) ? paginationNumber + 1 : currentPage + 1 %>">Next</a></li>
-                    </ul>
-                </nav>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
     const logs = JSON.parse('<%- JSON.stringify(logs) %>');
+
     const logTableBody = document.querySelector('.log__table-body');
 
     const logsHTML = logs.map(deviceLog => {
-        let date = new Date(deviceLog.date);
+        const deviceLogData = deviceLog.data
+        let date = new Date(deviceLogData.date);
         date = date.toLocaleDateString();
         return `
             <tr>
-                <td>${deviceLog.deviceId}</td>
-                <td>${deviceLog.ipAddress}</td>
-                <td>${deviceLog.deviceName}</td>
-                <td>${deviceLog.sensor}</td>
-                <td>${deviceLog.value}</td>
+                <td>${deviceLogData.deviceId}</td>
+                <td>${deviceLogData.ipAddress}</td>
+                <td>${deviceLogData.deviceName}</td>
+                <td>${deviceLogData.sensor}</td>
+                <td>${deviceLogData.value}</td>
                 <td>${date}</td>
             </tr>
         `;

@@ -6,10 +6,8 @@ const logRouter = require('./log')
 const dashboardApiRouter = require('./api/dashboard')
 const chartApiRouter = require('./api/chart')
 const mainApiRouter = require('./api/main')
-const logApiRouter = require('./api/log')
 
 function route(app) {
-    app.use('/api/log', logApiRouter)
     app.use('/api/main', mainApiRouter)
     app.use('/api/chart', chartApiRouter)
     app.use('/api', dashboardApiRouter)

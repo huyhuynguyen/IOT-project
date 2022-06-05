@@ -16,25 +16,19 @@ const db = require('../config/db/firebase');
 
 class LogController {
     async index(req, res, next) {
-        res.render('log', {
-            title: 'Logs',
-            logs: [],
-            paginationNumber: 2,
-            currentPage: 1
-        })
-    }
-
-    async indexApi(req, res, next) {
         const limitItem = process.env.LIMIT || 6
+        let page = +req.query.page || 1
+        if (page < 1)
+            page = 1
         const logRef = collection(db.database, "logs")
-        let q = ''
-        if (req.query.last) {
-            const docRef = doc(db.database, "logs", req.query.last)
-            const docRefSnapshot = await getDoc(docRef)
-            q = query(logRef, orderBy("date", "desc"), startAfter(docRefSnapshot), limit(limitItem));
-        } else {
-            q = query(logRef, orderBy("date", "desc"), limit(limitItem));
-        }
+        let q = query(logRef, orderBy("date", "desc"), limit(limitItem));
+        // if (req.query.last) {
+        //     const docRef = doc(db.database, "logs", req.query.last)
+        //     const docRefSnapshot = await getDoc(docRef)
+        //     q = query(logRef, orderBy("date", "desc"), startAfter(docRefSnapshot), limit(limitItem));
+        // } else {
+        //     q = query(logRef, orderBy("date", "desc"), limit(limitItem));
+        // }
 
 
         const documentSnapshots = await getDocs(q);
@@ -47,9 +41,9 @@ class LogController {
         });
         const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
 
-        return res.json({
-            result,
-            lastDoc: lastVisible.id
+        res.render('log', {
+            title: 'Logs',
+            logs: result,
         })
     }
 

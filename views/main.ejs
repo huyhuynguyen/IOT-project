@@ -46,7 +46,7 @@
                 <div class="value-sensor">
                     <div>
                         <p class="name">${sensor.data.name}</p>
-                        <p class="value">${sensor.data.value} ${sensor.data.unit}</p>
+                        <p class="value">${+sensor.data.value.toFixed(2)} ${sensor.data.unit}</p>
                     </div>
                     <div>
                         <img src="${sensor.data.icon}" alt="">
