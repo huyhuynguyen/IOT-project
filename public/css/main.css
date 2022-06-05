@@ -64,15 +64,17 @@ body {
 }
 
 
-.led__container {
+.led__container, .pump__container, .servo__container {
 	margin: 10px 0px;
 }
 
-.led__container .led__device {
+.led__container .led__device,
+.pump__container .pump__device,
+.servo__container .servo__device {
 	margin: 0 40px;
 }
 
-.btn-led {
+.btn-led, .btn-pump, .btn-servo {
 	font-weight: bold;
 	color: #fff;
 	background-color: #2196f3;
@@ -81,11 +83,11 @@ body {
 	cursor: pointer;
 }
 
-.led-on {
+.led-on, .pump-on, .servo-on {
 	background-color: #40f052;
 }
 
-.led-off {
+.led-off, .pump-off, .servo-off {
 	background-color: #f04040;
 }
 

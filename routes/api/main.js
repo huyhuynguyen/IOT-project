@@ -8,7 +8,6 @@ router.get('/controls/led', mainController.getLed);
 router.get('/controls/pump', mainController.getPump);
 router.get('/controls/servo', mainController.getServo);
 router.get('/sensors', mainController.getSensors);
-router.post('/sensor/change-led-status', mainController.changeLedStatus);
-// router.get('/', mainController.index);
+router.post('/sensor/change-control-device-status', mainController.changeControlDeviceStatus);
 
 module.exports = router;

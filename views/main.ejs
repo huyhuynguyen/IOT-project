@@ -58,37 +58,18 @@
     })
 
     fetchJSON('/api/main/controls/led').then(led => {
-        const ledContainer = document.querySelector('.led__container');
-        const ledObj = {
-            label: led.status ? 'On' : 'Off',
-            className: led.status ? 'led-on' : 'led-off'
-        }
-
-        const ledsHTML = `
-            <div class="led__device">
-                <p id=${+led.id} class="led-name">${led.name}</p>
-                <div class="led-label__container">
-                    <button class="btn-led ${ledObj.className}">${ledObj.label}</button>
-                </div>
-            </div>
-        `;
-        ledContainer.innerHTML = ledsHTML;
-
-        const btnLeds = document.querySelectorAll('.btn-led')
-        btnLeds.forEach(btnLed => {
-            btnLed.addEventListener('click', (e) => {
-                const ledButton = e.target
-                ledId = ledButton.closest('.led__device').querySelector('.led-name').id
-                changeLedStatus(ledButton)
-                sendajax(ledId)
-
-            })
-        })
+        getStateControlDevice(led, 'led');
     })
 
-    fetchJSON('')
+    fetchJSON('/api/main/controls/pump').then(pump => {
+        getStateControlDevice(pump, 'pump')
+    })
 
-    var sendajax = function(ledId) {
+    fetchJSON('/api/main/controls/servo').then(servo => {
+        getStateControlDevice(servo, 'servo')
+    })
+
+    var sendajax = function(docId) {
         var xhttp = new XMLHttpRequest()
 
         xhttp.onreadystatechange = function() {
@@ -97,20 +78,49 @@
             }
         }
 
-        xhttp.open('POST', 'http://localhost:5000/api/main/sensor/change-led-status', true)
-        // xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhttp.send();
+        xhttp.open('POST', 'http://localhost:5000/api/main/sensor/change-control-device-status', true)
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhttp.send(`deviceDoc=${docId}`);
     }
 
-    function changeLedStatus(ledButton) {
-        const ledButtonClassName = ledButton.className.split(' ')[1]
-        const ledButtonLabel = ledButton.innerText
-        const ledObj = {
-            label: ledButtonLabel == 'Off' ? 'On' : 'Off',
-            className: ledButtonClassName == 'led-off' ? 'led-on' : 'led-off'
+    function changeControlDeviceStatus(controlDeviceButton, controlDeviceClassName) {
+        const controlDeviceButtonClassName = controlDeviceButton.className.split(' ')[1]
+        const controlDeviceButtonLabel = controlDeviceButton.innerText
+        const controlDeviceObj = {
+            label: controlDeviceButtonLabel == 'Off' ? 'On' : 'Off',
+            className: controlDeviceButtonClassName == `${controlDeviceClassName}-off` ? `${controlDeviceClassName}-on` : `${controlDeviceClassName}-off`
         }
 
-        ledButton.innerText = ledObj.label
-        ledButton.className = ['btn-led', ledObj.className].join(' ')
+        controlDeviceButton.innerText = controlDeviceObj.label
+        controlDeviceButton.className = [`btn-${controlDeviceClassName}`, controlDeviceObj.className].join(' ')
+    }
+
+    function getStateControlDevice(controlDevice, controlDeviceClassName) {
+        const controlDeviceData = controlDevice.data
+        const controlDeviceContainer = document.querySelector(`.${controlDeviceClassName}__container`);
+        const controlDeviceObj = {
+            label: controlDeviceData.status ? 'On' : 'Off',
+            className: controlDeviceData.status ? `${controlDeviceClassName}-on` : `${controlDeviceClassName}-off`
+        }
+
+        const controlDeviceHTML = `
+            <div class="${controlDeviceClassName}__device">
+                <p id=${controlDevice.docId} class="${controlDeviceClassName}-name">${controlDeviceData.name}</p>
+                <div class="${controlDeviceClassName}-label__container">
+                    <button class="btn-${controlDeviceClassName} ${controlDeviceObj.className}">${controlDeviceObj.label}</button>
+                </div>
+            </div>
+        `;
+        controlDeviceContainer.innerHTML = controlDeviceHTML;
+
+        const btnControlDevices = document.querySelectorAll(`.btn-${controlDeviceClassName}`)
+        btnControlDevices.forEach(controlDevice => {
+            controlDevice.addEventListener('click', (e) => {
+                const controlDeviceButton = e.target
+                docId = controlDeviceButton.closest(`.${controlDeviceClassName}__device`).querySelector(`.${controlDeviceClassName}-name`).id
+                changeControlDeviceStatus(controlDeviceButton, controlDeviceClassName)
+                sendajax(docId)
+            })
+        })
     }
 </script>

@@ -3,8 +3,6 @@ const res = require('express/lib/response');
 const {
     getDocs,
     collection,
-    query,
-    where,
     doc,
     updateDoc,
     addDoc,
@@ -14,33 +12,8 @@ const db = require('../config/db/firebase');
 class MainController {
     async index(req, res, next) {
         res.render('main', {
-            title: 'Main',
-            sensors: [],
-            leds: []
+            title: 'Main'
         })
-
-        // const querySnapshotSensor = await getDocs(collection(db.database, "sensors"))
-        // const resultSensors = []
-        // querySnapshotSensor.forEach((doc) => {
-        //     resultSensors.push({
-        //         docid: doc.id,
-        //         data: doc.data()
-        //     })
-        // });
-
-        // const querySnapshotLed = await getDocs(collection(db.database, "controls"))
-        // const resultControls = []
-        // querySnapshotLed.forEach((doc) => {
-        //     resultControls.push({
-        //         docid: doc.id,
-        //         data: doc.data()
-        //     })
-        // });
-
-        // return res.json({
-        //     resultSensors,
-        //     resultControls
-        // })
     }
 
     async getSensors(req, res, next) {
@@ -58,29 +31,39 @@ class MainController {
     async getLed(req, res, next) {
         const docRef = doc(db.database, "controls", "led")
         const ledDoc = await getDoc(docRef)
-        return res.json(ledDoc.data());
+        return res.json({
+            docId: ledDoc.id,
+            data: ledDoc.data()
+        });
     }
 
     async getPump(req, res, next) {
         const docRef = doc(db.database, "controls", "pump")
-        const ledDoc = await getDoc(docRef)
-        return res.json(ledDoc.data());
+        const pumpDoc = await getDoc(docRef)
+        return res.json({
+            docId: pumpDoc.id,
+            data: pumpDoc.data()
+        });
     }
 
     async getServo(req, res, next) {
         const docRef = doc(db.database, "controls", "servo")
-        const ledDoc = await getDoc(docRef)
-        return res.json(ledDoc.data());
+        const servoDoc = await getDoc(docRef)
+        return res.json({
+            docId: servoDoc.id,
+            data: servoDoc.data()
+        });
     }
 
-    async changeLedStatus(req, res, next) {
-        const docRef = doc(db.database, "controls", "led")
+    async changeControlDeviceStatus(req, res, next) {
+        const deviceDoc = req.body.deviceDoc
+        const docRef = doc(db.database, "controls", deviceDoc)
         const ledDoc = await getDoc(docRef)
         const currentStatus = ledDoc.data().status
         await updateDoc(docRef, {
             status: !currentStatus
         })
-        
+
         return res.json('Success')
     }
 
@@ -109,7 +92,7 @@ class MainController {
                 })
             }
         });
-        
+
         return res.json('Success')
     }
 }
