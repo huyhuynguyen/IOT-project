@@ -3,14 +3,16 @@
         <div class="header__main">
             <h2>Dashboard</h2>
             <div>
-                <p>Chào mừng bạn đến với bài thực hành của nhóm 06 chúng tôi !!!!</p>
+                <p>Welcome to our IOT project</p>
     
                 <div>
                     <p>Tên nhóm: Nhóm 06</p>
                     <p>Thành viên 1: 18520846 - Nguyễn Quang Huy</p>
-                    <p>Thành viên 2: 1852 - Đoàn Văn Đắc</p>
-                    <p>Thành viên 3: 1852 - Lê Tuấn Anh</p>
-                    <p>Bài thực hành số 4</p>
+                    <p>Thành viên 2: 18520551 - Đoàn Văn Đắc</p>
+                    <p>Thành viên 3: 18520450 - Lê Tuấn Anh</p>
+                    <p>Thành viên 4: 19521761 - Vũ Mai Quỳnh Loan</p>
+                    <p>Thành viên 5: 18520264 - Vũ Tiến Đạt</p>
+                    <p>IOT Project: SmartFarm</p>
                 </div>
             </div>
         </div>
@@ -20,25 +22,32 @@
 </div>
 
 <script>
-    const devices = JSON.parse('<%- JSON.stringify(devices) %>');
-    const dashboardContent = document.querySelector('.dashboard__content');
+    async function fetchJSON() {
+        const response = await fetch('/api');
+        const data = await response.json();
+        return data;
+    }
 
-    const devicesHTML = devices.map(device => {
-        let date = new Date(device.lastAccess);
-        date = date.toLocaleDateString();
-        return `
-            <div class="card mx-5" style="width: 19rem;" id="${device.id}">
-                <img class="card-img-top" src="images/${device.imageName}" alt="Card image cap">
-                <div class="card-body">
-                    <h4>${device.name}</h4>
-                    <p>Active: <span class="status-color-active">${device.active}</span></p>
-                    <p class="card-text">
-                        <span>Last access date: </span> 
-                        <span>${date}</span>
-                    </p>
+    fetchJSON().then(devices => {
+        const dashboardContent = document.querySelector('.dashboard__content');
+
+        const devicesHTML = devices.map(device => {
+            let date = new Date(device.data.lastAccess);
+            date = date.toLocaleDateString();
+            return `
+                <div class="card mx-5" style="width: 19rem;" id="${device.data.id}">
+                    <img class="card-img-top" src="images/${device.data.image}" alt="Card image cap">
+                    <div class="card-body">
+                        <h4>${device.data.name}</h4>
+                        <p>Active: <span class="status-color-active">${device.data.active}</span></p>
+                        <p class="card-text">
+                            <span>Last access date: </span> 
+                            <span>${date}</span>
+                        </p>
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
-    dashboardContent.innerHTML = devicesHTML;
+            `;
+        }).join('');
+        dashboardContent.innerHTML = devicesHTML;
+    });
 </script>

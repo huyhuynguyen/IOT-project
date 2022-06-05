@@ -7,36 +7,43 @@ const {
     where,
     doc,
     updateDoc,
-    addDoc
+    addDoc,
+    getDoc
 } = require('firebase/firestore');
 const db = require('../config/db/firebase');
 class MainController {
     async index(req, res, next) {
-        const querySnapshotSensor = await getDocs(collection(db.database, "sensors"))
-        const resultSensors = []
-        querySnapshotSensor.forEach((doc) => {
-            resultSensors.push({
-                docid: doc.id,
-                data: doc.data()
-            })
-        });
-
-        const querySnapshotLed = await getDocs(collection(db.database, "leds"))
-        const resultLeds = []
-        querySnapshotLed.forEach((doc) => {
-            resultLeds.push({
-                docid: doc.id,
-                data: doc.data()
-            })
-        });
-
-        return res.json({
-            resultSensors,
-            resultLeds
+        res.render('main', {
+            title: 'Main',
+            sensors: [],
+            leds: []
         })
+
+        // const querySnapshotSensor = await getDocs(collection(db.database, "sensors"))
+        // const resultSensors = []
+        // querySnapshotSensor.forEach((doc) => {
+        //     resultSensors.push({
+        //         docid: doc.id,
+        //         data: doc.data()
+        //     })
+        // });
+
+        // const querySnapshotLed = await getDocs(collection(db.database, "controls"))
+        // const resultControls = []
+        // querySnapshotLed.forEach((doc) => {
+        //     resultControls.push({
+        //         docid: doc.id,
+        //         data: doc.data()
+        //     })
+        // });
+
+        // return res.json({
+        //     resultSensors,
+        //     resultControls
+        // })
     }
 
-    async getSensorsFunc() {
+    async getSensors(req, res, next) {
         const querySnapshot = await getDocs(collection(db.database, "sensors"))
         const result = []
         querySnapshot.forEach((doc) => {
@@ -48,33 +55,32 @@ class MainController {
         return res.json(result);
     }
 
-    async getLeds() {
-        const querySnapshot = await getDocs(collection(db.database, "leds"))
-        const result = []
-        querySnapshot.forEach((doc) => {
-            result.push({
-                docid: doc.id,
-                data: doc.data()
-            })
-        });
-        return res.json(result);
+    async getLed(req, res, next) {
+        const docRef = doc(db.database, "controls", "led")
+        const ledDoc = await getDoc(docRef)
+        return res.json(ledDoc.data());
+    }
+
+    async getPump(req, res, next) {
+        const docRef = doc(db.database, "controls", "pump")
+        const ledDoc = await getDoc(docRef)
+        return res.json(ledDoc.data());
+    }
+
+    async getServo(req, res, next) {
+        const docRef = doc(db.database, "controls", "servo")
+        const ledDoc = await getDoc(docRef)
+        return res.json(ledDoc.data());
     }
 
     async changeLedStatus(req, res, next) {
-        const ledId = +req.body.ledId
-        const sensorRef = collection(db.database, 'leds')
-        const q = query(sensorRef, where("id", '==', ledId))
-        const documentSnapshots = await getDocs(q)
-        let currentStatus = false
-        let docRef = ''
-        documentSnapshots.forEach((docItem) => {
-            docRef = doc(db.database, "leds", docItem.id)
-            currentStatus = docItem.data().status
-        });
+        const docRef = doc(db.database, "controls", "led")
+        const ledDoc = await getDoc(docRef)
+        const currentStatus = ledDoc.data().status
         await updateDoc(docRef, {
             status: !currentStatus
         })
-
+        
         return res.json('Success')
     }
 
@@ -85,7 +91,7 @@ class MainController {
         const sensorRef = collection(db.database, 'sensors')
         const documentSnapshots = await getDocs(sensorRef)
         documentSnapshots.forEach(async (docItem) => {
-            docRef = doc(db.database, "sensors", docItem.id)
+            const docRef = doc(db.database, "sensors", docItem.id)
             const now = dayjs().add(7, 'h')
             if (listKeys.includes(docItem.id)) {
                 await updateDoc(docRef, {

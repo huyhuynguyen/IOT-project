@@ -7,15 +7,23 @@
         <div class="main-page__wrapper">
             <div class="main-page__container">
                 <div class="sensor-table__header">
-                    <h4 class="sensor-table__heading">Điều khiển thiết bị</h4>
+                    <h4 class="sensor-table__heading">Control devices</h4>
                 </div>
                 <div class="sensor-table__body">
                     <div class="sensor-table__value d-flex">
                         
                     </div>
                     <div class="sensor-table__led">
-                        <h4>Các thiết bị</h4>
-                        <div class="led__container d-flex">
+                        <h4>Devices</h4>
+                        <div class="d-flex">
+                            <div class="led__container d-flex">
+                            </div>
+                            <div class="pump__container">
+
+                            </div>
+                            <div class="servo__container">
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -25,31 +33,38 @@
 </div>
 
 <script>
-    const sensors = JSON.parse('<%- JSON.stringify(sensors) %>');
-	const leds = JSON.parse('<%- JSON.stringify(leds) %>');
-    const sensorsTable = document.querySelector('.sensor-table__value');
-	const ledContainer = document.querySelector('.led__container');
+    async function fetchJSON(url) {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    }
 
-    const sensorsHTML = sensors.map(sensor => {
-        return `
-            <div class="value-sensor">
-                <div>
-                    <p class="name">${sensor.name}</p>
-                    <p class="value">${sensor.value} ${sensor.unit}</p>
+    fetchJSON('/api/main/sensors').then(sensors => {
+        const sensorsTable = document.querySelector('.sensor-table__value');
+        const sensorsHTML = sensors.map(sensor => {
+            return `
+                <div class="value-sensor">
+                    <div>
+                        <p class="name">${sensor.data.name}</p>
+                        <p class="value">${sensor.data.value} ${sensor.data.unit}</p>
+                    </div>
+                    <div>
+                        <img src="${sensor.data.icon}" alt="">
+                    </div>
                 </div>
-                <div>
-                    <img src="${sensor.icon}" alt="">
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+        sensorsTable.innerHTML = sensorsHTML;
+    })
 
-    const ledsHTML = leds.map(led => {
+    fetchJSON('/api/main/controls/led').then(led => {
+        const ledContainer = document.querySelector('.led__container');
         const ledObj = {
             label: led.status ? 'On' : 'Off',
             className: led.status ? 'led-on' : 'led-off'
         }
-        return `
+
+        const ledsHTML = `
             <div class="led__device">
                 <p id=${+led.id} class="led-name">${led.name}</p>
                 <div class="led-label__container">
@@ -57,9 +72,21 @@
                 </div>
             </div>
         `;
-    }).join('');
-    sensorsTable.innerHTML = sensorsHTML;
-    ledContainer.innerHTML = ledsHTML;
+        ledContainer.innerHTML = ledsHTML;
+
+        const btnLeds = document.querySelectorAll('.btn-led')
+        btnLeds.forEach(btnLed => {
+            btnLed.addEventListener('click', (e) => {
+                const ledButton = e.target
+                ledId = ledButton.closest('.led__device').querySelector('.led-name').id
+                changeLedStatus(ledButton)
+                sendajax(ledId)
+
+            })
+        })
+    })
+
+    fetchJSON('')
 
     var sendajax = function(ledId) {
         var xhttp = new XMLHttpRequest()
@@ -70,21 +97,10 @@
             }
         }
 
-        xhttp.open('POST', 'http://localhost:5000/main/sensor/change-led-status', true)
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhttp.send(`ledId=${ledId}`);
+        xhttp.open('POST', 'http://localhost:5000/api/main/sensor/change-led-status', true)
+        // xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhttp.send();
     }
-
-    const btnLeds = document.querySelectorAll('.btn-led')
-    btnLeds.forEach(btnLed => {
-        btnLed.addEventListener('click', (e) => {
-            const ledButton = e.target
-            ledId = ledButton.closest('.led__device').querySelector('.led-name').id
-            changeLedStatus(ledButton)
-            sendajax(ledId)
-
-        })
-    })
 
     function changeLedStatus(ledButton) {
         const ledButtonClassName = ledButton.className.split(' ')[1]

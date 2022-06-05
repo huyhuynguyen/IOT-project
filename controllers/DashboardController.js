@@ -2,6 +2,13 @@ const db = require('../config/db/firebase');
 const { getDocs, collection, updateDoc, doc } = require('firebase/firestore');
 class DashboardController {
     async index(req, res, next) {
+        return res.render('index', {
+            title: 'Dashboard',
+            devices: []
+        })
+    }
+
+    async indexApi(req, res, next) {
         const querySnapshot = await getDocs(collection(db.database, "devices"))
         const result = []
         querySnapshot.forEach((doc) => {

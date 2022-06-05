@@ -10,6 +10,15 @@ const db = require('../config/db/firebase');
 
 class ChartController {
     async index(req, res, next) {
+        return res.render('chart', {
+            title: 'Chart',
+            light: {},
+            humi: {},
+            temp: {}
+        })
+    }
+
+    async indexApi(req, res, next) {
         const chartLimit = process.env.CHART_ITEM
         const logRef = collection(db.database, "logs")
 
