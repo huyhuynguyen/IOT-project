@@ -67,6 +67,20 @@ class MainController {
         return res.json('Success')
     }
 
+    async changeControlDeviceManualStatus(req, res, next) {
+        const controlDeviceRef = collection(db.database, 'controls')
+        const documentSnapshots = await getDocs(controlDeviceRef)
+        documentSnapshots.forEach(async (docItem) => {
+            const docRef = doc(db.database, "controls", docItem.id)
+            const controlDeviceDoc = await getDoc(docRef)
+            const currentManualStatus = controlDeviceDoc.data().manual
+            await updateDoc(docRef, {
+                manual: !currentManualStatus
+            })
+        });
+        return res.json('Success')
+    }
+
     async updateSensors(req, res, next) {
         const dataBody = req.body
         const listKeys = Object.keys(dataBody)
