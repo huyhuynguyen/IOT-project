@@ -8,22 +8,28 @@
             <div class="row mx-5 my-5">
                 <div class="chart__component col-6" style="width: 500px; height: 500px;">
                     <div>
-                        <h4>Cảm biến nhiệt độ</h4>
+                        <h4>Temperature</h4>
                     </div>
-                    <canvas id="myChart3" width="400" height="400"></canvas>
+                    <canvas id="myChart_Temperature" width="400" height="400"></canvas>
                 </div>
                 <div class="chart__component col-6" style="width: 500px; height: 500px;">
                     <div>
-                        <h4>Cảm biến độ ẩm</h4>
+                        <h4>Humidity</h4>
                     </div>
-                    <canvas id="myChart2" width="400" height="400"></canvas>
+                    <canvas id="myChart_Humidity" width="400" height="400"></canvas>
                 </div>
                 <div class="w-100"></div>
                 <div class="chart__component col-6 mt-5" style="width: 500px; height: 500px;">
                     <div>
-                        <h4>Cảm biến ánh sáng</h4>
+                        <h4>Light</h4>
                     </div>
-                    <canvas id="myChart" width="400" height="400"></canvas>
+                    <canvas id="myChart_Light" width="400" height="400"></canvas>
+                </div>
+                <div class="chart__component col-6 mt-5" style="width: 500px; height: 500px;">
+                    <div>
+                        <h4>Soid Moisture </h4>
+                    </div>
+                    <canvas id="myChart_Moisture" width="400" height="400"></canvas>
                 </div>
             </div>
         </div>
@@ -31,9 +37,36 @@
 </div>
 
 <script>
-    const light = JSON.parse('<%- JSON.stringify(light) %>');
-    const humi = JSON.parse('<%- JSON.stringify(humi) %>');
-    const temp = JSON.parse('<%- JSON.stringify(temp) %>');
+    async function fetchJSON(url) {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    }
+
+    fetchJSON('/api/chart').then(charts => {
+        charts.forEach(chart => {
+            switch (chart.name) {
+                case "Humidity":
+                    drawChart('myChart_Humidity', 'bar', chart.data.map(item => item.value).reverse())
+                    break;
+                
+                case "Light":
+                    drawChart('myChart_Light', 'pie', chart.data.map(item => item.value).reverse())
+                    break;
+
+                case "Moisture":
+                    drawChart('myChart_Moisture', 'line', chart.data.map(item => item.value).reverse())
+                    break;
+
+                case "Temperature":
+                    drawChart('myChart_Temperature', 'line', chart.data.map(item => item.value).reverse())
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    })
     
     function drawChart(id, type, data = []) {
         const ctx = document.getElementById(id).getContext('2d');
@@ -79,8 +112,4 @@
             }
         });
     }
-
-    drawChart('myChart', 'pie', light.map(item => item.value).reverse());
-    drawChart('myChart2', 'bar', humi.map(item => item.value).reverse());
-    drawChart('myChart3', 'line', temp.map(item => item.value).reverse());
 </script>
