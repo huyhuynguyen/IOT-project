@@ -17,9 +17,6 @@ const db = require('../config/db/firebase');
 class LogController {
     async index(req, res, next) {
         const limitItem = process.env.LIMIT || 6
-        let page = +req.query.page || 1
-        if (page < 1)
-            page = 1
         const logRef = collection(db.database, "logs")
         let q = query(logRef, orderBy("date", "desc"), limit(limitItem));
 
